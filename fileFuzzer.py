@@ -48,18 +48,22 @@ class FileFuzzer:
 
     def mutate_file(self):
 
-        print "File mutation # %d", self.iteration
-
         fd = open(self.conf_file_path, "rb")
         stream = fd.read()
         fd.close()
 
-        test_case = self.test_cases[random.randint(0, len(self.test_cases) - 1)]
+        rand_index = random.randint(0, len(self.test_cases) - 1)
+        test_case = self.test_cases[rand_index]
         stream_length = len(stream)
         rand_len = random.randint(1, stream_length)
 
         # Now take the test case and repeat it
         test_case = test_case * rand_len
+
+        print "File mutation #", self.iteration
+        print "Current offset: ", self.offset
+        print "Test case`s index: ", rand_index
+        print "Test length: ", len(test_case)
 
         fuzz_file = stream[0:self.offset]
         fuzz_file += bytes(test_case)
