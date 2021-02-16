@@ -24,11 +24,13 @@ if __name__ == "__main__":
             fuzzer.auto_fuzzing()
 
         if command == 2:
-            # start_offset = input("Enter start offset: ")
-            # end_offset = input("Enter end offset: ")
-            # value = int(input("Enter value: "))
-            # amount = input("Enter amount: ")
-            # fuzzer.change_bytes(start_offset, end_offset, value, amount)
+            start_offset = input("Enter start offset: ")
+            end_offset = input("Enter end offset: ")
+            print "Choose test case: "
+            print fuzzer.test_cases
+            test_case_index = input("Enter index of byte: ")
+            amount = input("Enter amount: ")
+            fuzzer.change_bytes(start_offset, end_offset, test_case_index, amount)
             continue
 
         if command == 3:

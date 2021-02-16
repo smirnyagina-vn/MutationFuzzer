@@ -127,6 +127,9 @@ class FileFuzzer:
         stream = fd.read()
         fd.close()
 
+        if end_offset > len(stream):
+            end_offset = len(stream)
+
         fuzz_file = stream[0:start_offset - 1]
         fuzz_file += stream[end_offset:]
 
