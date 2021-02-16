@@ -3,6 +3,7 @@ import fileFuzzer
 exe_path = "C:\\Users\\Veronika\\PycharmProjects\\testFuzzer2\\vuln11.exe"
 config_path = "C:\\Users\\Veronika\\PycharmProjects\\testFuzzer2\\config_11"
 
+
 # vulns1\\
 
 if __name__ == "__main__":
@@ -23,30 +24,24 @@ if __name__ == "__main__":
             fuzzer.auto_fuzzing()
 
         if command == 2:
-            print "Enter start offset: "
-            start_offset = input()
-            print "Enter end offset: "
-            end_offset = input()
-            print "Enter symbol: "
-            symbol = input()
-            print "Enter amount: "
-            amount = input()
-            fuzzer.change_bytes(start_offset, end_offset, symbol, amount)
+            # start_offset = input("Enter start offset: ")
+            # end_offset = input("Enter end offset: ")
+            # value = int(input("Enter value: "))
+            # amount = input("Enter amount: ")
+            # fuzzer.change_bytes(start_offset, end_offset, value, amount)
+            continue
 
         if command == 3:
-            print "Enter start offset: "
-            start_offset = input()
-            print "Enter symbol: "
-            symbol = input()
-            print "Enter amount: "
-            amount = input()
-            fuzzer.add_bytes(start_offset, symbol, amount)
+            start_offset = input("Enter start offset: ")
+            print "Choose test case: "
+            print fuzzer.test_cases
+            test_case_index = input("Enter index of byte: ")
+            amount = input("Enter amount: ")
+            fuzzer.add_bytes(start_offset, test_case_index, amount)
 
         if command == 4:
-            print "Enter start offset: "
-            start_offset = input()
-            print "Enter end offset: "
-            end_offset = input()
+            start_offset = input("Enter start offset: ")
+            end_offset = input("Enter end offset: ")
             fuzzer.delete_bytes(start_offset, end_offset)
 
         if command == 5:

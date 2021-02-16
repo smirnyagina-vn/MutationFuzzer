@@ -13,10 +13,15 @@ class FileFuzzer:
         self.iteration = 1
         self.running = False
 
-        self.test_cases = [b'\x00', b'\x80', b'\x7f', b'\xff',
-                           b'\x7f\xff', b'\x80\x00', b'\x7f\xfe', b'\xff\xff',
-                           b'\x7f\xff\xff\xff', b'\x80\x00\x00', b'\x7f\xff\xff\xfe', b'\xff\xff\xff',
-                           b'\x7f\xff\xff\xff\xff', b'\x80\x00\x00\x00', b'\x7f\xff\xff\xff\xfe', b'\xff\xff\xff\xff']
+        # self.test_cases = [b'\x00', b'\x80', b'\x7f', b'\xff',
+        #                   b'\x7f\xff', b'\x80\x00', b'\x7f\xfe', b'\xff\xff',
+        #                   b'\x7f\xff\xff\xff', b'\x80\x00\x00', b'\x7f\xff\xff\xfe', b'\xff\xff\xff',
+        #                   b'\x7f\xff\xff\xff\xff', b'\x80\x00\x00\x00', b'\x7f\xff\xff\xff\xfe', b'\xff\xff\xff\xff']
+
+        self.test_cases = ["\x00", "\x80", "\x7f", "\xff",
+                           "\x7f\xff", "\x80\x00", "\x7f\xfe", "\xff\xff",
+                           "\x7f\xff\xff\xff", "\x80\x00\x00", "\x7f\xff\xff\xfe", "\xff\xff\xff",
+                           "\x7f\xff\xff\xff\xff", "\x80\x00\x00\x00", "\x7f\xff\xff\xff\xfe", "\xff\xff\xff\xff"]
 
         #                          ';'      ' '     '.'      ','
         self.dividing_fields = [b'\x3B', b'\x20', b'\x2E', b'\x2C',
@@ -90,21 +95,24 @@ class FileFuzzer:
 
         return
 
-    def change_bytes(self, start_offset, end_offset, value, amount):
+    def change_bytes(self, start_offset, end_offset, index, amount):
         self.delete_bytes(start_offset, end_offset)
-        self.add_bytes(start_offset, value, amount)
+        self.add_bytes(start_offset, index, amount)
         return
 
-    def add_bytes(self, file_offset, value, amount):
+    def add_bytes(self, file_offset, index, amount):
 
         fd = open(self.conf_file_path, "rb")
         stream = fd.read()
         fd.close()
 
-        value = value * amount
+        if file_offset > len(stream):
+            file_offset = len(stream)
+
+        new_bytes = self.test_cases[index] * amount
 
         fuzz_file = stream[0:file_offset]
-        fuzz_file += bytes(value)
+        fuzz_file += bytes(new_bytes)
         fuzz_file += stream[file_offset:]
 
         fd = open(self.conf_file_path, "wb")
@@ -119,7 +127,7 @@ class FileFuzzer:
         stream = fd.read()
         fd.close()
 
-        fuzz_file = stream[0:start_offset]
+        fuzz_file = stream[0:start_offset - 1]
         fuzz_file += stream[end_offset:]
 
         fd = open(self.conf_file_path, "wb")
