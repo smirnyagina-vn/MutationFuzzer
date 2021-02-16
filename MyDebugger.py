@@ -40,6 +40,7 @@ def my_event_handler(event):
 
         # Generate a minimal crash dump.
         crash = Crash(event)
+        print crash
 
         # You can turn it into a full crash dump (recommended).
         # crash.fetch_extra_data( event, takeMemorySnapshot = 0 ) # no memory dump

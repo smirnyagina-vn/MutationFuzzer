@@ -22,7 +22,7 @@ class FileFuzzer:
                            "\x7f\xff", "\x80\x00", "\x7f\xfe", "\xff\xff",
                            "\x7f\xff\xff\xff", "\x80\x00\x00", "\x7f\xff\xff\xfe", "\xff\xff\xff",
                            "\x7f\xff\xff\xff\xff", "\x80\x00\x00\x00", "\x7f\xff\xff\xff\xfe", "\xff\xff\xff\xff",
-                           "%s%n%s%n%s%n"]
+                           "%s%n%s%n%s%n", "\x3B", "\n", "\x2F"]
 
         #                          ';'      ' '     '.'      ','
         self.dividing_fields = [b'\x3B', b'\x20', b'\x2E', b'\x2C',
@@ -35,10 +35,11 @@ class FileFuzzer:
             self.mutate_file()
 
             # New debugging thread
+            print "Launch program..."
             proc = subprocess.Popen([self.exe_path], stdout=subprocess.PIPE)
             status = subprocess.Popen.wait(proc)
 
-            print('Error ', status)
+            print "Program finished with status ", status
             print(proc.stdout.read())
 
             if status != 0:
