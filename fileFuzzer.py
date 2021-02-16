@@ -21,12 +21,12 @@ class FileFuzzer:
         self.test_cases = ["\x00", "\x80", "\x7f", "\xff",
                            "\x7f\xff", "\x80\x00", "\x7f\xfe", "\xff\xff",
                            "\x7f\xff\xff\xff", "\x80\x00\x00", "\x7f\xff\xff\xfe", "\xff\xff\xff",
-                           "\x7f\xff\xff\xff\xff", "\x80\x00\x00\x00", "\x7f\xff\xff\xff\xfe", "\xff\xff\xff\xff"]
+                           "\x7f\xff\xff\xff\xff", "\x80\x00\x00\x00", "\x7f\xff\xff\xff\xfe", "\xff\xff\xff\xff",
+                           "%s%n%s%n%s%n"]
 
         #                          ';'      ' '     '.'      ','
         self.dividing_fields = [b'\x3B', b'\x20', b'\x2E', b'\x2C',
                                 b'\x21', b'\x3F', b'\x3A', b'\x2F']
-
         #                          '!'     '?'      ':'       '/'
 
     def auto_fuzzing(self):
@@ -46,7 +46,7 @@ class FileFuzzer:
 
         return
 
-    def mutate_file(self):
+    def mutate_file(self, rand_range=1000):
 
         fd = open(self.conf_file_path, "rb")
         stream = fd.read()
@@ -55,7 +55,7 @@ class FileFuzzer:
         rand_index = random.randint(0, len(self.test_cases) - 1)
         test_case = self.test_cases[rand_index]
         stream_length = len(stream)
-        rand_len = random.randint(1, stream_length)
+        rand_len = random.randint(1, rand_range)
 
         # Now take the test case and repeat it
         test_case = test_case * rand_len
@@ -75,6 +75,7 @@ class FileFuzzer:
 
         # Upgrade the offset
         self.offset += len(test_case)
+        self.iteration += 1
 
         return
 
