@@ -2,7 +2,7 @@ import fileFuzzer
 
 exe_path = "C:\\Users\\Veronika\\PycharmProjects\\testFuzzer2\\vuln11.exe"
 config_path = "C:\\Users\\Veronika\\PycharmProjects\\testFuzzer2\\config_11"
-
+mut_folder_path = "C:\\Users\\Veronika\\PycharmProjects\\testFuzzer2\\mutations"
 
 # vulns1\\
 
@@ -15,7 +15,7 @@ if __name__ == "__main__":
     print "5 - Random mutation"
     print "6 - Find dividing fields"
 
-    fuzzer = fileFuzzer.FileFuzzer(exe_path, config_path)
+    fuzzer = fileFuzzer.FileFuzzer(exe_path, config_path, mut_folder_path)
 
     while True:
         command = input("Enter command: ")

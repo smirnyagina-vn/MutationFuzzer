@@ -1,27 +1,21 @@
 import random
 import subprocess
-import MyDebugger
+import myDebugger
 
 
 class FileFuzzer:
-    def __init__(self, exe_path, conf_file_path):
+    def __init__(self, exe_path, conf_file_path, mut_folder_path):
         self.conf_file_path = conf_file_path
-        # self.conf_dir_path = conf_dir_path
-        # self.conf_num = conf_num
+        self.mut_folder_path = mut_folder_path
         self.exe_path = exe_path
         self.offset = 1
         self.iteration = 1
         self.running = False
 
-        # self.test_cases = [b'\x00', b'\x80', b'\x7f', b'\xff',
-        #                   b'\x7f\xff', b'\x80\x00', b'\x7f\xfe', b'\xff\xff',
-        #                   b'\x7f\xff\xff\xff', b'\x80\x00\x00', b'\x7f\xff\xff\xfe', b'\xff\xff\xff',
-        #                   b'\x7f\xff\xff\xff\xff', b'\x80\x00\x00\x00', b'\x7f\xff\xff\xff\xfe', b'\xff\xff\xff\xff']
-
         self.test_cases = ["\x00", "\x80", "\x7f", "\xff",
                            "\x7f\xff", "\x80\x00", "\x7f\xfe", "\xff\xff",
-                           "\x7f\xff\xff\xff", "\x80\x00\x00", "\x7f\xff\xff\xfe", "\xff\xff\xff",
-                           "\x7f\xff\xff\xff\xff", "\x80\x00\x00\x00", "\x7f\xff\xff\xff\xfe", "\xff\xff\xff\xff",
+                           "\x7f\xff\xff", "\x80\x00\x00", "\x7f\xff\xfe", "\xff\xff\xff",
+                           "\x7f\xff\xff\xff", "\x80\x00\x00\x00", "\x7f\xff\xff\xfe", "\xff\xff\xff\xff",
                            "%s%n%s%n%s%n", "\x3B", "\n", "\x2F"]
 
         #                          ';'      ' '     '.'      ','
@@ -29,21 +23,56 @@ class FileFuzzer:
                                 b'\x21', b'\x3F', b'\x3A', b'\x2F']
         #                          '!'     '?'      ':'       '/'
 
+        with open(conf_file_path, 'rb') as fd:
+            self.stream = fd.read()
+
     def auto_fuzzing(self):
         while 1:
 
-            self.mutate_file()
+            counter = 0
+            for iterator in self.test_cases:
+                self.change_bytes(self.offset, self.offset, counter, 1)
 
-            # New debugging thread
-            print "Launch program..."
-            proc = subprocess.Popen([self.exe_path], stdout=subprocess.PIPE)
-            status = subprocess.Popen.wait(proc)
+                print "File mutation #", self.iteration
+                print "Current offset: ", self.offset
+                print "Test case`s index: ", counter
 
-            print "Program finished with status ", status
-            print(proc.stdout.read())
+                # New debugging thread
+                self.start_debugger()
 
-            if status != 0:
-                MyDebugger.simple_debugger([self.exe_path])
+                fd = open(self.conf_file_path, "wb")
+                fd.write(self.stream)
+                fd.close()
+
+                self.iteration += 1
+                counter += 1
+
+            self.offset += 1
+
+        return
+
+    def start_debugger(self):
+        print "Launch program..."
+        proc = subprocess.Popen([self.exe_path], stdout=subprocess.PIPE)
+        status = subprocess.Popen.wait(proc)
+
+        print "Program finished with status ", status
+        print(proc.stdout.read())
+
+        if status != 0:
+            self.save_config()
+            myDebugger.simple_debugger([self.exe_path])
+        return
+
+    def save_config(self):
+
+        fd = open(self.conf_file_path, "rb")
+        stream = fd.read()
+        fd.close()
+
+        fd = open(self.mut_folder_path + "\\" + "config_mutation_" + str(self.iteration), "wb")
+        fd.write(stream)
+        fd.close()
 
         return
 
@@ -136,8 +165,8 @@ class FileFuzzer:
         if end_offset > len(stream):
             end_offset = len(stream)
 
-        fuzz_file = stream[0:start_offset - 1]
-        fuzz_file += stream[end_offset:]
+        fuzz_file = stream[0:start_offset]
+        fuzz_file += stream[end_offset + 1:]
 
         fd = open(self.conf_file_path, "wb")
         fd.write(fuzz_file)
